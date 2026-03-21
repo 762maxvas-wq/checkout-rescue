@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlatformSource {
+  stripe
+  shopify
+  shopify_payments
+}
+
+enum Severity {
+  low
+  medium
+  high
+  critical
+}
+
+enum SubscriptionPlan {
+  free
+  pro
+  team
+}
+
+enum SubscriptionStatus {
+  active
+  inactive
+  canceled
+  past_due
+  trialing
+}
+
+model User {
+  id             String              @id @default(cuid())
+  externalAuthId String              @unique
+  email          String              @unique
+  name           String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  subscription   Subscription?
+  requests       DiagnosticRequest[]
+  results        DiagnosticResult[]
+  usageLogs      UsageLog[]
+}
+
+model DiagnosticRule {
+  id               String           @id @default(cuid())
+  canonicalCode    String           @unique
+  title            String
+  description      String
+  severity         Severity
+  supportedSources PlatformSource[]
+  confidenceBase   Int
+  probableImpact   String
+  humanExplanation String
+  likelyCauses     Json
+  firstChecks      Json
+  fixPlan          Json
+  supportTemplate  String
+  seoTerms         Json
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model DiagnosticRequest {
+  id             String           @id @default(cuid())
+  userId         String?
+  source         PlatformSource
+  issueInput     String
+  context        String?
+  normalizedCode String?
+  createdAt      DateTime         @default(now())
+  user           User?            @relation(fields: [userId], references: [id])
+  result         DiagnosticResult?
+
+  @@index([source])
+  @@index([normalizedCode])
+  @@index([createdAt])
+}
+
+model DiagnosticResult {
+  id               String             @id @default(cuid())
+  requestId        String             @unique
+  userId           String?
+  source           PlatformSource
+  canonicalCode    String
+  title            String
+  severity         Severity
+  confidence       Int
+  probableImpact   String
+  humanExplanation String
+  likelyCauses     Json
+  firstChecks      Json
+  fixPlan          Json?
+  supportTemplate  String?
+  isPremiumLocked  Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  request          DiagnosticRequest  @relation(fields: [requestId], references: [id])
+  user             User?              @relation(fields: [userId], references: [id])
+
+  @@index([canonicalCode])
+  @@index([severity])
+  @@index([createdAt])
+}
+
+model Subscription {
+  id               String              @id @default(cuid())
+  userId           String              @unique
+  plan             SubscriptionPlan    @default(free)
+  status           SubscriptionStatus  @default(active)
+  stripeCustomerId String?             @unique
+  stripeSubId      String?             @unique
+  currentPeriodEnd DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  user             User                @relation(fields: [userId], references: [id])
+}
+
+model UsageLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, action, createdAt])
+}
+model DiagnosticRun {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  source            String
+  issueInput        String
+  context           String
+  resultTitle       String
+  canonicalCode     String
+  sourceLabel       String
+  severity          String
+  confidence        Int
+  humanExplanation  String
+  probableImpact    String
+}

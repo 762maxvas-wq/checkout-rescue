@@ -93,14 +93,6 @@ export default function AppHeader() {
             }}
           >
             <PlanStatusPill />
-
-            <Link
-              href="/pricing"
-              className="app-link-button app-link-button--ghost"
-            >
-              Тарифы
-            </Link>
-
             <UserButton afterSignOutUrl="/" />
           </div>
         </SignedIn>

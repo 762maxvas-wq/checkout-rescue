@@ -5,6 +5,16 @@ import { useState, type FormEvent } from "react";
 import type { DiagnoseResponse, PlatformSource } from "@/lib/types";
 import { UpgradeButton } from "@/components/UpgradeButton";
 
+function getSeverityLabel(severity: string) {
+  const value = severity.toLowerCase();
+
+  if (value === "low") return "Низкая";
+  if (value === "medium") return "Средняя";
+  if (value === "high") return "Высокая";
+
+  return severity;
+}
+
 export function DiagnoseForm({
   initialIssue = "authentication_required",
 }: {
@@ -13,7 +23,7 @@ export function DiagnoseForm({
   const [source, setSource] = useState<PlatformSource>("shopify");
   const [issueInput, setIssueInput] = useState(initialIssue);
   const [context, setContext] = useState(
-    "Shopify store. Stripe payment fails after 3DS challenge."
+    "Магазин Shopify. Платёж Stripe не проходит после 3DS-подтверждения."
   );
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<DiagnoseResponse | null>(null);
@@ -63,7 +73,7 @@ export function DiagnoseForm({
           "message" in data &&
           typeof data.message === "string"
             ? data.message
-            : apiError || "Request failed";
+            : apiError || "Не удалось выполнить запрос";
 
         if (res.status === 403 && apiError === "free_limit_reached") {
           setFreeLimitReached(true);
@@ -77,7 +87,7 @@ export function DiagnoseForm({
       const typedData = data as DiagnoseResponse;
       setResult(typedData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : "Неизвестная ошибка");
     } finally {
       setLoading(false);
     }
@@ -88,31 +98,31 @@ export function DiagnoseForm({
       <section className="split-grid">
         <div className="app-card">
           <div className="display-eyebrow">
-            <span className="app-badge">Diagnose</span>
+            <span className="app-badge">Диагностика</span>
           </div>
 
           <h1 className="section-title">Почему не проходит оплата</h1>
 
           <p className="hero-lead">
             Введите код ошибки и контекст заказа, чтобы получить понятный
-            разбор: уровень критичности, confidence, вероятные причины и первые
-            шаги для проверки.
+            разбор: уровень критичности, уверенность оценки, вероятные причины и
+            первые шаги для проверки.
           </p>
 
           <div className="kpi-grid">
             <div className="kpi-card">
               <div className="kpi-card__value">Stripe</div>
-              <div className="kpi-card__label">payment diagnostics</div>
+              <div className="kpi-card__label">платёжная диагностика</div>
             </div>
 
             <div className="kpi-card">
               <div className="kpi-card__value">Shopify</div>
-              <div className="kpi-card__label">checkout cases</div>
+              <div className="kpi-card__label">сценарии checkout</div>
             </div>
 
             <div className="kpi-card">
-              <div className="kpi-card__value">Fast</div>
-              <div className="kpi-card__label">first checks</div>
+              <div className="kpi-card__value">Быстро</div>
+              <div className="kpi-card__label">первые проверки</div>
             </div>
           </div>
         </div>
@@ -124,7 +134,7 @@ export function DiagnoseForm({
 
           <ul className="list-tight app-secondary" style={{ marginBottom: 18 }}>
             <li>понятное объяснение ошибки</li>
-            <li>уровень критичности и confidence</li>
+            <li>уровень критичности и уверенность оценки</li>
             <li>вероятные причины отказа</li>
             <li>первые шаги для проверки</li>
           </ul>
@@ -146,8 +156,8 @@ export function DiagnoseForm({
             </div>
 
             <p style={{ margin: 0 }}>
-              Частый сценарий: клиент не завершил 3DS / SCA challenge, и оплата
-              остановилась на этапе подтверждения.
+              Частый сценарий: клиент не завершил 3DS / SCA-подтверждение, и
+              оплата остановилась на этапе подтверждения.
             </p>
           </div>
         </div>
@@ -226,7 +236,7 @@ export function DiagnoseForm({
           }}
         >
           <div className="page-kicker">
-            <span className="app-badge">Upgrade</span>
+            <span className="app-badge">Тариф Pro</span>
           </div>
 
           <h2
@@ -242,7 +252,7 @@ export function DiagnoseForm({
 
           <p className="section-subtitle" style={{ maxWidth: "100%" }}>
             {limitMessage ||
-              "Free plan includes 3 diagnoses. Upgrade to Pro to continue."}
+              "Бесплатный тариф включает 3 разбора. Перейдите на Pro, чтобы продолжить."}
           </p>
 
           <div
@@ -258,8 +268,8 @@ export function DiagnoseForm({
               <ul className="list-tight app-secondary">
                 <li>3 бесплатных разбора</li>
                 <li>базовая диагностика ошибки</li>
-                <li>severity и confidence</li>
-                <li>likely causes и first checks</li>
+                <li>критичность и уверенность оценки</li>
+                <li>вероятные причины и первые проверки</li>
               </ul>
             </div>
 
@@ -267,8 +277,8 @@ export function DiagnoseForm({
               <h3 style={{ marginTop: 0 }}>Что откроет Pro</h3>
               <ul className="list-tight app-secondary">
                 <li>безлимитные разборы</li>
-                <li>полный fix-plan</li>
-                <li>support template</li>
+                <li>полный план исправления</li>
+                <li>шаблон обращения в поддержку</li>
                 <li>расширенный рабочий сценарий</li>
               </ul>
             </div>
@@ -290,7 +300,7 @@ export function DiagnoseForm({
       {error && (
         <section className="app-card app-card--danger">
           <div className="app-badge" style={{ marginBottom: 12 }}>
-            Error
+            Ошибка
           </div>
 
           <div style={{ color: "var(--danger-text)" }}>
@@ -310,7 +320,7 @@ export function DiagnoseForm({
                 marginBottom: 10,
               }}
             >
-              Result
+              Результат
             </div>
 
             <h2
@@ -329,21 +339,21 @@ export function DiagnoseForm({
 
             <div className="metric-grid">
               <div className="metric-card">
-                <div className="metric-card__label">Severity</div>
+                <div className="metric-card__label">Критичность</div>
                 <div className="metric-card__value">
-                  {result.result.severity}
+                  {getSeverityLabel(result.result.severity)}
                 </div>
               </div>
 
               <div className="metric-card">
-                <div className="metric-card__label">Confidence</div>
+                <div className="metric-card__label">Уверенность</div>
                 <div className="metric-card__value">
                   {result.result.confidence}%
                 </div>
               </div>
 
               <div className="metric-card">
-                <div className="metric-card__label">Free left</div>
+                <div className="metric-card__label">Осталось бесплатно</div>
                 <div className="metric-card__value">
                   {typeof result.remainingFreeRuns !== "undefined" &&
                   result.remainingFreeRuns !== null
@@ -363,7 +373,7 @@ export function DiagnoseForm({
 
             <section style={{ marginTop: 24 }}>
               <h3 style={{ fontSize: 24, letterSpacing: "-0.02em" }}>
-                Likely causes
+                Вероятные причины
               </h3>
               <ul className="list-tight">
                 {result.result.likelyCauses.map((item, index) => (
@@ -374,7 +384,7 @@ export function DiagnoseForm({
 
             <section style={{ marginTop: 24 }}>
               <h3 style={{ fontSize: 24, letterSpacing: "-0.02em" }}>
-                First checks
+                Первые проверки
               </h3>
               <ul className="list-tight">
                 {result.result.firstChecks.map((item, index) => (
@@ -394,7 +404,7 @@ export function DiagnoseForm({
                   marginBottom: 8,
                 }}
               >
-                Full resolve
+                Полный разбор
               </div>
 
               <h3
@@ -408,7 +418,7 @@ export function DiagnoseForm({
               </h3>
 
               <p className="app-secondary" style={{ lineHeight: 1.75 }}>
-                Расширенный доступ открывает пошаговый fix-plan, шаблон
+                Расширенный доступ открывает пошаговый план исправления, шаблон
                 обращения в поддержку и более глубокий разбор кейса.
               </p>
 
@@ -418,8 +428,8 @@ export function DiagnoseForm({
                     className="list-tight app-secondary"
                     style={{ marginBottom: 20 }}
                   >
-                    <li>пошаговый fix-plan</li>
-                    <li>support template</li>
+                    <li>пошаговый план исправления</li>
+                    <li>шаблон обращения в поддержку</li>
                     <li>история похожих кейсов</li>
                     <li>приоритетный доступ к расширенному разбору</li>
                   </ul>
@@ -429,7 +439,7 @@ export function DiagnoseForm({
               ) : (
                 <>
                   <div style={{ marginBottom: 18 }}>
-                    <strong>Fix plan:</strong>
+                    <strong>План исправления:</strong>
                     <ul className="list-tight">
                       {result.result.fixPlan?.map((item, index) => (
                         <li key={`${index}-${item}`}>{item}</li>
@@ -438,7 +448,7 @@ export function DiagnoseForm({
                   </div>
 
                   <p style={{ lineHeight: 1.75 }}>
-                    <strong>Support template:</strong>{" "}
+                    <strong>Шаблон обращения в поддержку:</strong>{" "}
                     {result.result.supportTemplate}
                   </p>
                 </>

@@ -4,25 +4,35 @@ import AppHeader from "@/components/AppHeader";
 const articles = [
   {
     code: "authentication_required",
-    title: "Authentication required",
+    title: "Требуется дополнительная аутентификация",
     description:
       "Платёж требует дополнительной аутентификации клиента (3DS / SCA).",
     severity: "Medium",
   },
   {
     code: "do_not_honor",
-    title: "Do not honor",
+    title: "Отклонено банком",
     description:
       "Банк отклонил операцию без объяснения. Обычно это решение эмитента.",
     severity: "High",
   },
   {
     code: "insufficient_funds",
-    title: "Insufficient funds",
+    title: "Недостаточно средств",
     description: "Недостаточно средств на карте клиента.",
     severity: "Low",
   },
 ];
+
+function getSeverityLabel(severity: string) {
+  const value = severity.toLowerCase();
+
+  if (value === "low") return "Низкая";
+  if (value === "medium") return "Средняя";
+  if (value === "high") return "Высокая";
+
+  return severity;
+}
 
 export default function KbPage() {
   return (
@@ -31,15 +41,15 @@ export default function KbPage() {
 
       <section className="app-card" style={{ marginBottom: 24 }}>
         <div className="page-kicker">
-          <span className="app-badge">Knowledge Base</span>
+          <span className="app-badge">База знаний</span>
         </div>
 
         <h1 className="page-section-title">База знаний</h1>
 
         <p className="section-subtitle">
-          Справочник типовых ошибок платежей и checkout-проблем. Здесь можно
-          быстро открыть нужный код и получить краткое объяснение, severity и
-          первые шаги для проверки.
+          Справочник типовых ошибок платежей и проблем checkout. Здесь можно
+          быстро открыть нужный код и получить краткое объяснение, уровень
+          критичности и первые шаги для проверки.
         </p>
       </section>
 
@@ -71,7 +81,9 @@ export default function KbPage() {
                   </div>
                 </div>
 
-                <div className="stat-pill">Severity: {a.severity}</div>
+                <div className="stat-pill">
+                  Критичность: {getSeverityLabel(a.severity)}
+                </div>
               </div>
 
               <p

@@ -15,15 +15,81 @@ export async function requireAppUser() {
     throw new Error("email_required");
   }
 
-  const name = [clerkUser?.firstName, clerkUser?.lastName].filter(Boolean).join(" ") || null;
+  const name =
+    [clerkUser?.firstName, clerkUser?.lastName].filter(Boolean).join(" ") || null;
 
-  const user = await prisma.user.upsert({
+  // 1) Сначала ищем пользователя по Clerk ID
+  const existingByExternalAuthId = await prisma.user.findUnique({
     where: { externalAuthId: userId },
-    update: {
-      email,
-      name,
-    },
-    create: {
+    include: { subscription: true },
+  });
+
+  if (existingByExternalAuthId) {
+    const updated = await prisma.user.update({
+      where: { id: existingByExternalAuthId.id },
+      data: {
+        email,
+        name,
+      },
+      include: { subscription: true },
+    });
+
+    if (updated.subscription) {
+      return updated;
+    }
+
+    return prisma.user.update({
+      where: { id: updated.id },
+      data: {
+        subscription: {
+          create: {
+            plan: "free",
+            status: "active",
+          },
+        },
+      },
+      include: { subscription: true },
+    });
+  }
+
+  // 2) Если по Clerk ID не нашли, ищем по email
+  // Это как раз чинит текущую ошибку unique email
+  const existingByEmail = await prisma.user.findUnique({
+    where: { email },
+    include: { subscription: true },
+  });
+
+  if (existingByEmail) {
+    const updated = await prisma.user.update({
+      where: { id: existingByEmail.id },
+      data: {
+        externalAuthId: userId,
+        name,
+      },
+      include: { subscription: true },
+    });
+
+    if (updated.subscription) {
+      return updated;
+    }
+
+    return prisma.user.update({
+      where: { id: updated.id },
+      data: {
+        subscription: {
+          create: {
+            plan: "free",
+            status: "active",
+          },
+        },
+      },
+      include: { subscription: true },
+    });
+  }
+
+  // 3) Если вообще никого нет — создаём нового
+  return prisma.user.create({
+    data: {
       externalAuthId: userId,
       email,
       name,
@@ -34,10 +100,6 @@ export async function requireAppUser() {
         },
       },
     },
-    include: {
-      subscription: true,
-    },
+    include: { subscription: true },
   });
-
-  return user;
 }

@@ -5,14 +5,25 @@ import { createCheckoutSession } from "@/lib/billing";
 export async function POST() {
   try {
     const user = await requireAppUser();
-    const priceId = process.env.STRIPE_PRO_PRICE_ID;
 
+    const priceId = process.env.STRIPE_PRO_PRICE_ID;
     if (!priceId) {
       return NextResponse.json(
-        {
-          ok: false,
-          error: "STRIPE_PRO_PRICE_ID is not configured",
-        },
+        { ok: false, error: "STRIPE_PRO_PRICE_ID_missing" },
+        { status: 500 }
+      );
+    }
+
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return NextResponse.json(
+        { ok: false, error: "STRIPE_SECRET_KEY_missing" },
+        { status: 500 }
+      );
+    }
+
+    if (!process.env.NEXT_PUBLIC_APP_URL) {
+      return NextResponse.json(
+        { ok: false, error: "NEXT_PUBLIC_APP_URL_missing" },
         { status: 500 }
       );
     }
@@ -25,49 +36,34 @@ export async function POST() {
 
     if (!session.url) {
       return NextResponse.json(
-        {
-          ok: false,
-          error: "Stripe did not return checkout url",
-        },
+        { ok: false, error: "stripe_session_url_missing" },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({
-      ok: true,
-      url: session.url,
-    });
+    return NextResponse.json({ ok: true, url: session.url });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "checkout_session_failed";
 
+    console.error("api/billing/checkout failed:", error);
+
     if (message === "unauthorized") {
       return NextResponse.json(
-        {
-          ok: false,
-          error: "unauthorized",
-        },
+        { ok: false, error: "unauthorized" },
         { status: 401 }
       );
     }
 
     if (message === "email_required") {
       return NextResponse.json(
-        {
-          ok: false,
-          error: "email_required",
-        },
+        { ok: false, error: "email_required" },
         { status: 400 }
       );
     }
 
-    console.error("billing checkout failed:", error);
-
     return NextResponse.json(
-      {
-        ok: false,
-        error: message,
-      },
+      { ok: false, error: message },
       { status: 500 }
     );
   }

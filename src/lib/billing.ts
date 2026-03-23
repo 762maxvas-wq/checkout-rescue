@@ -119,9 +119,9 @@ export async function activateProPlanFromCheckoutSession(sessionId: string) {
   const plan = mapPriceIdToPlan(priceId);
   const status = mapStripeStatus(subscription.status);
   const currentPeriodEnd =
-    typeof subscription.current_period_end === "number"
-      ? new Date(subscription.current_period_end * 1000)
-      : null;
+  typeof firstItem?.current_period_end === "number"
+    ? new Date(firstItem.current_period_end * 1000)
+    : null;
 
   await prisma.subscription.upsert({
     where: { userId },

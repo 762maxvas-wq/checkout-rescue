@@ -45,19 +45,19 @@ export default function HomePage() {
 
           <div style={{ position: "relative", zIndex: 1 }}>
             <div className="display-eyebrow">
-              <span className="app-badge">Payment diagnostics for Stripe & Shopify</span>
+              <span className="app-badge">Диагностика ошибок оплаты</span>
             </div>
 
             <h1 className="section-title" style={{ maxWidth: 760 }}>
-              Разбирайте checkout-ошибки
+              Разбор ошибок оплаты
               <br />
-              быстрее, точнее, спокойнее
+              для Stripe и Shopify
             </h1>
 
             <p className="hero-lead" style={{ maxWidth: 680, marginTop: 18 }}>
-              Checkout Rescue помогает быстро понять, почему не проходит оплата,
-              насколько проблема критична и какие шаги стоит сделать дальше,
-              чтобы не терять выручку и клиентов.
+              Получите ответ, почему не проходит платёж. Введите код ошибки и
+              получите понятное объяснение, вероятные причины и первые шаги к
+              решению.
             </p>
 
             <div
@@ -203,7 +203,9 @@ export default function HomePage() {
             <span className="app-badge">Why teams use it</span>
           </div>
 
-          <h2 className="page-section-title">Почему это удобно в реальной работе</h2>
+          <h2 className="page-section-title">
+            Почему это удобно в реальной работе
+          </h2>
 
           <p className="section-subtitle" style={{ marginBottom: 24 }}>
             Checkout Rescue создан не ради красивой витрины, а ради скорости,

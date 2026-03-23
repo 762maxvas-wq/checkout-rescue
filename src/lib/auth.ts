@@ -44,7 +44,7 @@ export async function requireAppUser() {
         subscription: {
           create: {
             plan: "free",
-            status: "active",
+            status: "inactive",
           },
         },
       },
@@ -79,7 +79,7 @@ export async function requireAppUser() {
         subscription: {
           create: {
             plan: "free",
-            status: "active",
+            status: "inactive",
           },
         },
       },
@@ -96,7 +96,7 @@ export async function requireAppUser() {
       subscription: {
         create: {
           plan: "free",
-          status: "active",
+          status: "inactive",
         },
       },
     },

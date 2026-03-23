@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { requireAppUser } from "@/lib/auth";
 import { createCheckoutSession } from "@/lib/billing";
 
+export const runtime = "nodejs";
+
 export async function POST() {
   try {
     const user = await requireAppUser();
 
-    const priceId = process.env.STRIPE_PRO_PRICE_ID;
+    const priceId = process.env.STRIPE_PRO_PRICE_ID?.trim();
     if (!priceId) {
       return NextResponse.json(
         { ok: false, error: "STRIPE_PRO_PRICE_ID_missing" },
@@ -14,17 +16,31 @@ export async function POST() {
       );
     }
 
-    if (!process.env.STRIPE_SECRET_KEY) {
+    if (!process.env.STRIPE_SECRET_KEY?.trim()) {
       return NextResponse.json(
         { ok: false, error: "STRIPE_SECRET_KEY_missing" },
         { status: 500 }
       );
     }
 
-    if (!process.env.NEXT_PUBLIC_APP_URL) {
+    if (!process.env.NEXT_PUBLIC_APP_URL?.trim()) {
       return NextResponse.json(
         { ok: false, error: "NEXT_PUBLIC_APP_URL_missing" },
         { status: 500 }
+      );
+    }
+
+    if (!user?.id) {
+      return NextResponse.json(
+        { ok: false, error: "unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    if (!user?.email) {
+      return NextResponse.json(
+        { ok: false, error: "email_required" },
+        { status: 400 }
       );
     }
 
@@ -41,30 +57,28 @@ export async function POST() {
       );
     }
 
-    return NextResponse.json({ ok: true, url: session.url });
+    return NextResponse.json(
+      { ok: true, url: session.url },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      }
+    );
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "checkout_session_failed";
 
     console.error("api/billing/checkout failed:", error);
 
-    if (message === "unauthorized") {
-      return NextResponse.json(
-        { ok: false, error: "unauthorized" },
-        { status: 401 }
-      );
-    }
+    const status =
+      message === "unauthorized"
+        ? 401
+        : message === "email_required"
+        ? 400
+        : 500;
 
-    if (message === "email_required") {
-      return NextResponse.json(
-        { ok: false, error: "email_required" },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json(
-      { ok: false, error: message },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: message }, { status });
   }
 }

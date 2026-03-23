@@ -53,7 +53,12 @@ export async function createCheckoutSession({
 
     return session;
   } catch (error) {
-    console.error("Stripe checkout create failed:", error);
-    throw new Error("checkout_session_failed");
+  console.error("Stripe checkout create failed:", error);
+
+  if (error instanceof Error) {
+    throw new Error(error.message);
   }
+
+  throw new Error("checkout_session_failed");
+}
 }

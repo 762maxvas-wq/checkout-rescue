@@ -48,16 +48,15 @@ export default function HomePage() {
               <span className="app-badge">Диагностика ошибок оплаты</span>
             </div>
 
-            <h1 className="section-title" style={{ maxWidth: 760 }}>
-              Разбор ошибок оплаты
+            <h1 className="section-title" style={{ maxWidth: 640 }}>
+              Ошибки оплаты
               <br />
-              для Stripe и Shopify
+              в Stripe и Shopify
             </h1>
 
-            <p className="hero-lead" style={{ maxWidth: 680, marginTop: 18 }}>
-              Получите ответ, почему не проходит платёж. Введите код ошибки и
-              получите понятное объяснение, вероятные причины и первые шаги к
-              решению.
+            <p className="hero-lead" style={{ maxWidth: 620, marginTop: 18 }}>
+              Получите ответ, почему не проходит платёж: введите код ошибки и
+              узнайте вероятные причины и первые шаги к решению.
             </p>
 
             <div
@@ -69,10 +68,10 @@ export default function HomePage() {
               </Link>
 
               <Link
-                href="/pricing"
+                href="/knowledge-base"
                 className="app-link-button app-link-button--ghost"
               >
-                Посмотреть тарифы
+                Открыть базу знаний
               </Link>
             </div>
           </div>
@@ -82,19 +81,19 @@ export default function HomePage() {
             style={{ position: "relative", zIndex: 1, marginTop: 10 }}
           >
             <div className="kpi-card">
-              <div className="kpi-card__value">3 free</div>
+              <div className="kpi-card__value">3 бесплатно</div>
               <div className="kpi-card__label">первых разбора без оплаты</div>
             </div>
 
             <div className="kpi-card">
-              <div className="kpi-card__value">Fast</div>
+              <div className="kpi-card__value">Быстрый старт</div>
               <div className="kpi-card__label">
-                быстрый первый ориентир по ошибке
+                первый ориентир по ошибке за пару минут
               </div>
             </div>
 
             <div className="kpi-card">
-              <div className="kpi-card__value">Pro</div>
+              <div className="kpi-card__value">Pro-доступ</div>
               <div className="kpi-card__label">
                 полный сценарий диагностики без лимита
               </div>

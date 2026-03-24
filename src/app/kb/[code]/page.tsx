@@ -255,7 +255,7 @@ export default async function KbCodePage({
           <p className="article-lead">{article.explanation}</p>
 
           <section>
-            <h2>Canonical code</h2>
+            <h2>Код ошибки</h2>
             <p>
               <strong>{code}</strong>
             </p>
@@ -300,7 +300,7 @@ export default async function KbCodePage({
         <aside className="sidebar-stack sticky-panel">
           <div className="app-card">
             <div className="app-badge" style={{ marginBottom: 12 }}>
-              Быстрое действие
+              Быстрый переход
             </div>
 
             <h3
@@ -316,7 +316,7 @@ export default async function KbCodePage({
 
             <p className="app-secondary" style={{ lineHeight: 1.8 }}>
               Хочешь сразу проверить код на практике — открой диагностику с уже
-              подставленным issue.
+              подставленным кодом ошибки.
             </p>
 
             <Link href={`/diagnose?issue=${code}`} className="app-link-button">

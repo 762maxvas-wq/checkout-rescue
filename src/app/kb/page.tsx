@@ -22,6 +22,41 @@ const articles = [
     description: "Недостаточно средств на карте клиента.",
     severity: "Low",
   },
+  {
+    code: "card_declined",
+    title: "Платёж отклонён банком",
+    description:
+      "Банк-эмитент отклонил операцию. Причина может быть связана с ограничениями карты или внутренними правилами банка.",
+    severity: "High",
+  },
+  {
+    code: "expired_card",
+    title: "Срок действия карты истёк",
+    description:
+      "Карта клиента больше не действительна, поэтому оплата не может быть завершена.",
+    severity: "Medium",
+  },
+  {
+    code: "processing_error",
+    title: "Ошибка обработки платежа",
+    description:
+      "Во время обработки платежа произошёл технический сбой на стороне системы или провайдера.",
+    severity: "High",
+  },
+  {
+    code: "incorrect_number",
+    title: "Неверный номер карты",
+    description:
+      "Провайдер получил некорректный номер карты. Обычно это ошибка ввода данных.",
+    severity: "Medium",
+  },
+  {
+    code: "fraudulent",
+    title: "Платёж помечен как подозрительный",
+    description:
+      "Антифрод-система определила высокий риск операции и отклонила платёж.",
+    severity: "High",
+  },
 ];
 
 function getSeverityLabel(severity: string) {

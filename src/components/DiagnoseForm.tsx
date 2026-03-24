@@ -112,17 +112,17 @@ export function DiagnoseForm({
           <div className="kpi-grid">
             <div className="kpi-card">
               <div className="kpi-card__value">Stripe</div>
-              <div className="kpi-card__label">платёжная диагностика</div>
+              <div className="kpi-card__label">диагностика платёжных ошибок</div>
             </div>
 
             <div className="kpi-card">
               <div className="kpi-card__value">Shopify</div>
-              <div className="kpi-card__label">сценарии checkout</div>
+              <div className="kpi-card__label">сценарии оплаты и отказов</div>
             </div>
 
             <div className="kpi-card">
               <div className="kpi-card__value">Быстро</div>
-              <div className="kpi-card__label">первые проверки</div>
+              <div className="kpi-card__label">первые проверки и ориентир</div>
             </div>
           </div>
         </div>

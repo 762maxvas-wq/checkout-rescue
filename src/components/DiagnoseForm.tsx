@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { DiagnoseResponse, PlatformSource } from "@/lib/types";
 import { UpgradeButton } from "@/components/UpgradeButton";
 
@@ -22,14 +22,19 @@ export function DiagnoseForm({
 }) {
   const [source, setSource] = useState<PlatformSource>("shopify");
   const [issueInput, setIssueInput] = useState(initialIssue);
-  const [context, setContext] = useState(
-    "Магазин Shopify. Платёж Stripe не проходит после 3DS-подтверждения."
-  );
+  const [context, setContext] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<DiagnoseResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [freeLimitReached, setFreeLimitReached] = useState(false);
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
+  const resultRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (result || error || freeLimitReached) {
+      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [result, error, freeLimitReached]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -195,6 +200,7 @@ export function DiagnoseForm({
                 value={context}
                 disabled={loading}
                 onChange={(e) => setContext(e.target.value)}
+                placeholder="Опишите здесь вашу проблему"
                 rows={7}
               />
             </label>
@@ -226,6 +232,8 @@ export function DiagnoseForm({
           </div>
         </form>
       </section>
+
+      <div ref={resultRef} />
 
       {freeLimitReached && (
         <section

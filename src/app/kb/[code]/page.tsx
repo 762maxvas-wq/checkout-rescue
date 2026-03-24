@@ -15,7 +15,7 @@ const kbArticles: Record<
   }
 > = {
   authentication_required: {
-    title: "Authentication required",
+    title: "Требуется дополнительная аутентификация",
     explanation:
       "Платёж требует дополнительной аутентификации клиента. Чаще всего это 3DS / SCA-подтверждение, которое не было завершено или прошло с ошибкой.",
     severity: "Medium",
@@ -42,7 +42,7 @@ const kbArticles: Record<
   },
 
   do_not_honor: {
-    title: "Do not honor",
+    title: "Отклонено банком без объяснения",
     explanation:
       "Банк отклонил операцию без подробного объяснения. Обычно это решение на стороне эмитента карты.",
     severity: "High",
@@ -69,7 +69,7 @@ const kbArticles: Record<
   },
 
   insufficient_funds: {
-    title: "Insufficient funds",
+    title: "Недостаточно средств",
     explanation:
       "На карте клиента недостаточно средств для завершения платежа.",
     severity: "Low",
@@ -91,7 +91,140 @@ const kbArticles: Record<
       "card declined insufficient funds",
     ],
   },
+
+  card_declined: {
+    title: "Платёж отклонён банком",
+    explanation:
+      "Банк-эмитент отклонил операцию. Это общее сообщение, за которым могут скрываться ограничения карты, риск-оценка или внутренние правила банка.",
+    severity: "High",
+    impact:
+      "Покупатель не завершает оплату, а магазин теряет часть конверсии.",
+    likelyCauses: [
+      "Банк отклонил операцию по внутренним правилам",
+      "Карта ограничена для онлайн-платежей",
+      "Сработали антифрод-фильтры",
+      "Попытка оплаты выглядит нетипично для банка",
+    ],
+    firstChecks: [
+      "Проверить, есть ли более точный decline code в логах провайдера",
+      "Сравнить долю отказов по странам, устройствам и BIN",
+      "Попросить покупателя попробовать другую карту или способ оплаты",
+    ],
+    seoTerms: [
+      "card declined stripe",
+      "shopify card declined",
+      "payment failed card declined",
+    ],
+  },
+
+  expired_card: {
+    title: "Срок действия карты истёк",
+    explanation:
+      "Провайдер сообщает, что срок действия карты уже истёк. Обычно это пользовательская ошибка или устаревшие данные сохранённой карты.",
+    severity: "Medium",
+    impact:
+      "Покупатель не может завершить оплату, хотя проблема обычно не связана с интеграцией.",
+    likelyCauses: [
+      "Покупатель ввёл данные карты с истёкшим сроком действия",
+      "В аккаунте сохранена устаревшая карта",
+      "Покупатель не заметил, что карта уже недействительна",
+    ],
+    firstChecks: [
+      "Проверить, нет ли всплеска на сохранённых картах",
+      "Убедиться, что ошибка не маскирует другую проблему формы",
+      "Сделать текст ошибки понятным для пользователя",
+    ],
+    seoTerms: [
+      "expired card stripe",
+      "shopify expired card",
+      "payment failed expired card",
+    ],
+  },
+
+  processing_error: {
+    title: "Ошибка обработки платежа",
+    explanation:
+      "Во время обработки платежа произошёл технический сбой. Это может быть временная проблема на стороне провайдера, сети или конкретного сценария checkout.",
+    severity: "High",
+    impact:
+      "Пользователь не может завершить оплату, а причина выглядит как технический сбой в процессе обработки.",
+    likelyCauses: [
+      "Временный сбой на стороне платёжного провайдера",
+      "Проблема в сетевом взаимодействии между checkout и провайдером",
+      "Ошибка проявляется только в части браузеров или устройств",
+      "Сбой вызван нестабильным сценарием подтверждения платежа",
+    ],
+    firstChecks: [
+      "Проверить сырые логи ошибки и время возникновения",
+      "Сравнить частоту processing_error по браузерам и устройствам",
+      "Убедиться, что проблема не связана с недавними изменениями checkout",
+    ],
+    seoTerms: [
+      "processing error stripe",
+      "shopify processing error",
+      "payment processing error checkout",
+    ],
+  },
+
+  incorrect_number: {
+    title: "Неверный номер карты",
+    explanation:
+      "Провайдер получил неверный номер карты. Обычно это ошибка ввода или неудачная попытка использовать недействительную карту.",
+    severity: "Medium",
+    impact:
+      "Покупатель не завершает оплату, но проблема обычно связана с вводом данных, а не с интеграцией.",
+    likelyCauses: [
+      "Покупатель ввёл номер карты с ошибкой",
+      "Часть номера карты была скопирована некорректно",
+      "Форма оплаты недостаточно ясно показывает ошибку ввода",
+    ],
+    firstChecks: [
+      "Проверить, нет ли всплеска после изменений формы оплаты",
+      "Убедиться, что поле номера карты корректно работает на мобильных устройствах",
+      "Проверить текст ошибки и понятность подсказок для пользователя",
+    ],
+    seoTerms: [
+      "incorrect number stripe",
+      "shopify incorrect card number",
+      "payment failed incorrect number",
+    ],
+  },
+
+  fraudulent: {
+    title: "Платёж помечен как подозрительный",
+    explanation:
+      "Платёж был отмечен как подозрительный антифрод-системой. Это не всегда означает реальное мошенничество, но операция считается рискованной.",
+    severity: "High",
+    impact:
+      "Часть реальных покупателей может быть заблокирована вместе с действительно рискованными попытками оплаты.",
+    likelyCauses: [
+      "Антифрод-модель определила высокий риск транзакции",
+      "Нетипичная страна, устройство или поведение покупателя",
+      "Много повторных попыток за короткое время",
+      "Профиль заказа выглядит рискованно для провайдера или банка",
+    ],
+    firstChecks: [
+      "Проверить risk signals и fraud insights в логах провайдера",
+      "Сравнить долю таких отказов по странам, устройствам и payment methods",
+      "Убедиться, что не было резких изменений в checkout flow или трафике",
+    ],
+    seoTerms: [
+      "fraudulent stripe",
+      "shopify fraudulent payment",
+      "payment flagged as fraudulent",
+    ],
+  },
 };
+
+function getSeverityLabel(severity: string) {
+  const value = severity.toLowerCase();
+
+  if (value === "low") return "Низкая";
+  if (value === "medium") return "Средняя";
+  if (value === "high") return "Высокая";
+
+  return severity;
+}
 
 export default async function KbCodePage({
   params,
@@ -115,7 +248,7 @@ export default async function KbCodePage({
 
       <section className="result-layout">
         <article className="app-card article-content">
-          <div className="article-kicker">Knowledge Base</div>
+          <div className="article-kicker">База знаний</div>
 
           <h1 className="article-title">{article.title}</h1>
 
@@ -131,7 +264,7 @@ export default async function KbCodePage({
           <section>
             <h2>Насколько это критично</h2>
             <p>
-              <strong>Severity:</strong> {article.severity}
+              <strong>Критичность:</strong> {getSeverityLabel(article.severity)}
             </p>
             <p className="app-secondary">{article.impact}</p>
           </section>
@@ -167,7 +300,7 @@ export default async function KbCodePage({
         <aside className="sidebar-stack sticky-panel">
           <div className="app-card">
             <div className="app-badge" style={{ marginBottom: 12 }}>
-              Quick action
+              Быстрое действие
             </div>
 
             <h3
@@ -193,7 +326,7 @@ export default async function KbCodePage({
 
           <div className="app-card">
             <div className="app-badge" style={{ marginBottom: 12 }}>
-              Next step
+              Следующий шаг
             </div>
 
             <h3

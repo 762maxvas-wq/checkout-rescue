@@ -49,7 +49,7 @@ export default function HomePage() {
             </div>
 
             <h1 className="section-title" style={{ maxWidth: 640 }}>
-              Ошибки оплаты
+              Разбор ошибок оплаты
               <br />
               в Stripe и Shopify
             </h1>
@@ -81,12 +81,12 @@ export default function HomePage() {
             style={{ position: "relative", zIndex: 1, marginTop: 10 }}
           >
             <div className="kpi-card">
-              <div className="kpi-card__value">3 бесплатно</div>
-              <div className="kpi-card__label">первых разбора без оплаты</div>
+              <div className="kpi-card__value">3 бесплатных разбора</div>
+              <div className="kpi-card__label">первые проверки без оплаты</div>
             </div>
 
             <div className="kpi-card">
-              <div className="kpi-card__value">Быстрый старт</div>
+              <div className="kpi-card__value">Быстрый разбор</div>
               <div className="kpi-card__label">
                 первый ориентир по ошибке за пару минут
               </div>

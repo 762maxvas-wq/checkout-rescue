@@ -477,6 +477,177 @@ const rules: SeedRule[] = [
       "payment flagged as fraudulent",
     ],
   },
+{
+  canonicalCode: "pickup_card",
+  title: "Карта заблокирована банком",
+  description: "The card must be picked up by the issuer",
+  severity: "critical",
+  supportedSources: ["stripe", "shopify", "shopify_payments"],
+  confidenceBase: 88,
+  probableImpact: "Платёж не может быть завершён, а карта клиента, скорее всего, уже заблокирована банком.",
+  humanExplanation:
+    "Банк-эмитент сообщает, что карта больше не должна использоваться. Обычно это означает, что карта заблокирована, изъята или признана недействительной.",
+  likelyCauses: [
+    "Карта заблокирована банком",
+    "Банк пометил карту как недействительную",
+    "Старая карта больше не обслуживается",
+    "Платёжная операция запрещена на стороне эмитента",
+  ],
+  firstChecks: [
+    "Попросить клиента использовать другую карту",
+    "Не предлагать повторять ту же оплату много раз",
+    "Проверить, не выросла ли доля таких отказов у конкретного BIN",
+  ],
+  fixPlan: [
+    "Показать клиенту понятное сообщение о необходимости другой карты",
+    "Сократить число повторных попыток по тому же способу оплаты",
+    "Проверить, нет ли роста отказов по отдельным банкам или регионам",
+    "Добавить альтернативный способ оплаты в checkout",
+  ],
+  supportTemplate:
+    "Hello support team. We are seeing pickup_card responses during checkout. Please confirm whether these are standard issuer-side blocked card events and whether any provider-side anomaly is visible.",
+  seoTerms: [
+    "pickup card stripe",
+    "shopify pickup card",
+    "card declined pickup card",
+  ],
+},
+{
+  canonicalCode: "lost_card",
+  title: "Карта отмечена как утерянная",
+  description: "The issuer marked the card as lost",
+  severity: "critical",
+  supportedSources: ["stripe", "shopify", "shopify_payments"],
+  confidenceBase: 91,
+  probableImpact: "Платёж отклоняется, а карта клиента, вероятно, уже не может использоваться для новых операций.",
+  humanExplanation:
+    "Банк сообщает, что карта числится как утерянная. Обычно такая карта блокируется, и попытка оплаты по ней отклоняется автоматически.",
+  likelyCauses: [
+    "Карта была отмечена владельцем как утерянная",
+    "Банк уже выпустил замену старой карте",
+    "Клиент пытается оплатить старой заблокированной картой",
+  ],
+  firstChecks: [
+    "Попросить клиента использовать другую карту",
+    "Проверить, нет ли повторных попыток по тому же card fingerprint",
+    "Убедиться, что ошибка приходит именно от эмитента",
+  ],
+  fixPlan: [
+    "Не предлагать повтор оплаты по той же карте",
+    "Добавить понятное сообщение о необходимости другой карты",
+    "Отслеживать, не растёт ли доля таких отказов в отдельных сегментах",
+    "Проверить UX повторной оплаты после отказа",
+  ],
+  supportTemplate:
+    "Hello support team. We are seeing lost_card declines during checkout. Please confirm these are issuer-side responses for blocked or replaced cards and whether any unusual pattern is visible.",
+  seoTerms: [
+    "lost card stripe",
+    "shopify lost card",
+    "card declined lost card",
+  ],
+},
+{
+  canonicalCode: "stolen_card",
+  title: "Карта отмечена как украденная",
+  description: "The issuer marked the card as stolen",
+  severity: "critical",
+  supportedSources: ["stripe", "shopify", "shopify_payments"],
+  confidenceBase: 93,
+  probableImpact: "Платёж отклоняется автоматически, а операция рассматривается как высокорисковая.",
+  humanExplanation:
+    "Банк сообщает, что карта числится как украденная. Такие операции почти всегда блокируются автоматически.",
+  likelyCauses: [
+    "Карта была помечена банком как украденная",
+    "Используется уже заблокированная карта",
+    "Операция попала под усиленный риск-контроль",
+  ],
+  firstChecks: [
+    "Не предлагать повторную оплату по той же карте",
+    "Проверить связанные risk signals в системе провайдера",
+    "Сравнить частоту таких отказов по странам и типам трафика",
+  ],
+  fixPlan: [
+    "Показать клиенту просьбу использовать другой способ оплаты",
+    "Проверить, не связано ли это с всплеском мошеннических попыток",
+    "Отследить, нет ли необычного роста таких отказов по устройствам или регионам",
+    "Проверить логи антифрод-системы и провайдера",
+  ],
+  supportTemplate:
+    "Hello support team. We are seeing stolen_card declines during checkout. Please confirm whether these are standard issuer-side blocked-card responses and whether any fraud-related trend is visible in recent attempts.",
+  seoTerms: [
+    "stolen card stripe",
+    "shopify stolen card",
+    "card declined stolen card",
+  ],
+},
+{
+  canonicalCode: "invalid_expiry_month",
+  title: "Неверно указан месяц окончания карты",
+  description: "The expiration month provided is invalid",
+  severity: "medium",
+  supportedSources: ["stripe", "shopify", "shopify_payments"],
+  confidenceBase: 97,
+  probableImpact: "Покупатель не может завершить оплату, но проблема обычно связана только с неверным вводом данных.",
+  humanExplanation:
+    "Провайдер сообщает, что месяц срока действия карты введён некорректно. Обычно это простая ошибка пользователя или неудачный ввод в форме.",
+  likelyCauses: [
+    "Покупатель ошибся при вводе месяца",
+    "Форма оплаты неудобно обрабатывает дату карты",
+    "Автозаполнение браузера подставило неверные данные",
+  ],
+  firstChecks: [
+    "Проверить поведение поля даты на мобильных устройствах",
+    "Убедиться, что формат ввода понятен пользователю",
+    "Проверить, не было ли изменений в маске поля карты",
+  ],
+  fixPlan: [
+    "Сделать подсказку формата даты более понятной",
+    "Проверить маску ввода для месяца и года",
+    "Упростить повторную попытку оплаты после ошибки",
+    "Протестировать форму на мобильных браузерах и автозаполнении",
+  ],
+  supportTemplate:
+    "Hello support team. We are seeing invalid_expiry_month responses and want to confirm these are standard invalid expiration month entry issues rather than a form parsing problem.",
+  seoTerms: [
+    "invalid expiry month stripe",
+    "shopify invalid expiry month",
+    "payment failed invalid expiry month",
+  ],
+},
+{
+  canonicalCode: "invalid_expiry_year",
+  title: "Неверно указан год окончания карты",
+  description: "The expiration year provided is invalid",
+  severity: "medium",
+  supportedSources: ["stripe", "shopify", "shopify_payments"],
+  confidenceBase: 97,
+  probableImpact: "Покупатель не завершает оплату, но проблема обычно связана с вводом даты карты, а не с интеграцией.",
+  humanExplanation:
+    "Провайдер сообщает, что год срока действия карты введён некорректно. Обычно это ошибка пользователя или проблема формы ввода.",
+  likelyCauses: [
+    "Покупатель ввёл неправильный год окончания карты",
+    "Автозаполнение браузера подставило неверное значение",
+    "Форма оплаты некорректно обрабатывает ввод года",
+  ],
+  firstChecks: [
+    "Проверить поле срока действия на мобильных устройствах",
+    "Убедиться, что формат ввода года понятен пользователю",
+    "Проверить, не ломает ли автозаполнение форму оплаты",
+  ],
+  fixPlan: [
+    "Добавить более понятную подсказку для поля даты",
+    "Проверить маску ввода и обработку года окончания карты",
+    "Упростить повторную попытку оплаты после ошибки",
+    "Протестировать форму оплаты с автозаполнением и ручным вводом",
+  ],
+  supportTemplate:
+    "Hello support team. We are seeing invalid_expiry_year responses and want to confirm these are standard invalid expiration year entry events rather than a provider-side parsing issue.",
+  seoTerms: [
+    "invalid expiry year stripe",
+    "shopify invalid expiry year",
+    "payment failed invalid expiry year",
+  ],
+},
 ];
 
 async function main() {
